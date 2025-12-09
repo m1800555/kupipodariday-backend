@@ -15,4 +15,8 @@ export default () => ({
     entities: [Offer, User, Wish, Wishlist],
     synchronize: true,
   },
+  jwt: {
+    secret: process.env.JWT_SECRET || 'jwt_secret',
+    ttl: process.env.JWT_TTL || 60 * 60,
+  },
 });

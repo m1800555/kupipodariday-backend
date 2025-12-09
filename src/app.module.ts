@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import config from './config/config';
 import { DatabaseConfigFactory } from './config/db-config.factory';
+import { AuthModule } from './auth/auth.module';
 import { OffersModule } from './offers/offers.module';
 import { UsersModule } from './users/users.module';
 import { WishesModule } from './wishes/wishes.module';
@@ -19,6 +20,7 @@ import { WishlistsModule } from './wishlists/wishlists.module';
       inject: [ConfigService],
       useClass: DatabaseConfigFactory,
     }),
+    AuthModule,
     OffersModule,
     UsersModule,
     WishesModule,
