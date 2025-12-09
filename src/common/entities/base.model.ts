@@ -1,7 +1,7 @@
 import { CreateDateColumn, UpdateDateColumn, PrimaryGeneratedColumn } from 'typeorm';
 import { IsDate, IsInt } from 'class-validator';
 
-export class BaseModel {
+export abstract class BaseModel {
   @PrimaryGeneratedColumn()
   @IsInt()
   id: number;
