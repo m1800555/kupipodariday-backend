@@ -1,35 +1,46 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, Param, UseGuards } from '@nestjs/common';
 
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { WishesService } from 'src/wishes/wishes.service';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { FindUserDto } from './dto/find-user.dto';
+import { User } from './entities/user.entity';
+import { Wish } from 'src/wishes/entities/wish.entity';
+import { AuthUser } from 'src/common/decorators/user.decorator';
+import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 
+@UseGuards(JwtAuthGuard)
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService, private readonly wishesService: WishesService) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  @Get('me')
+  async findMe(@AuthUser('id') id: number): Promise<User> {
+    return await this.usersService.findById(id);
   }
 
-  @Get()
-  findAll() {
-    return this.usersService.findAll();
+  @Patch('me')
+  async updateMe(@AuthUser('id') id: number, @Body() updateUserDto: UpdateUserDto): Promise<User> {
+    return this.usersService.update(id, updateUserDto);
+  }
+
+  @Get('me/wishes')
+  async findMyWishes(@AuthUser('id') id: number): Promise<Wish[]> {
+    return await this.wishesService.findWishesByUserId(id);
   }
 
   @Get(':username')
-  findOne(@Param('username') username: string) {
-    return this.usersService.findOne({ where: { username } });
+  async findByUsername(@Param('username') username: string) {
+    return this.usersService.findByUsername(username);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  @Get(':username/wishes')
+  async findUserWishes(@Param('username') username: string): Promise<Wish[]> {
+    return await this.wishesService.findWishesByUsername(username);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  @Post('find')
+  async findMany(@Body() findUserDto: FindUserDto): Promise<User[]> {
+    return await this.usersService.findMany(findUserDto);
   }
 }
