@@ -13,7 +13,10 @@ export class AuthService {
   ) {}
 
   async validateUser(username: string, password: string) {
-    const user = await this.usersService.findOne(username);
+    const user = await this.usersService.findOne({
+      select: { id: true, password: true },
+      where: { username },
+    });
     if (user && (await this.hashService.verifyHash(password, user.password))) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password, ...userWithoutPassword } = user;

@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, FindOneOptions } from 'typeorm';
 
 import { HashService } from 'src/hash/hash.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -22,13 +22,14 @@ export class UsersService {
       where: [{ username }, { email }],
     });
     if (existingUser) {
-      throw new ConflictException('Такой пользователь уже существует');
+      throw new ConflictException('Пользователь с таким email или username уже зарегистрирован');
     }
     const hashedPassword = await this.hashService.getHash(password);
     const user = await this.usersRepository.save({
       ...createUserDto,
       password: hashedPassword,
     });
+    delete user.password;
     return user;
   }
 
@@ -36,11 +37,8 @@ export class UsersService {
     return `This action returns all users`;
   }
 
-  async findOne(username: string) {
-    const user = await this.usersRepository.findOne({
-      where: { username },
-    });
-    return user;
+  async findOne(query: FindOneOptions<User>): Promise<User> {
+    return this.usersRepository.findOneOrFail(query);
   }
 
   async findById(id: number): Promise<User> {
