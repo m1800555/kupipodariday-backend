@@ -23,7 +23,7 @@ export class OffersService {
       throw new ConflictException('Нельзя скинуться на свой подарок');
     }
 
-    const total = wish.raised + amount;
+    const total = +wish.raised + amount;
     if (total > wish.price) {
       throw new ConflictException('Сумма предложения превышает оставшуюся сумму');
     }
