@@ -56,6 +56,14 @@ export class WishesService {
     return this.wishRepository.save({ ...wish, ...updateWishDto });
   }
 
+  async updateRaised(id: number, raised: number) {
+    const wish = await this.wishRepository.update(id, { raised });
+    if (!wish) {
+      throw new NotFoundException('Подарок не найден');
+    }
+    return wish;
+  }
+
   async remove(wishId: number, userId: number): Promise<Wish> {
     const wish = await this.findById(wishId);
     if (!wish) {
