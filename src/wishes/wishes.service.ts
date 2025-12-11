@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 
 import { CreateWishDto } from './dto/create-wish.dto';
 import { UpdateWishDto } from './dto/update-wish.dto';
@@ -11,7 +11,7 @@ import { User } from 'src/users/entities/user.entity';
 export class WishesService {
   constructor(@InjectRepository(Wish) private readonly wishRepository: Repository<Wish>) {}
 
-  create(createWishDto: CreateWishDto, user: User) {
+  async create(createWishDto: CreateWishDto, user: User) {
     return this.wishRepository.save({ ...createWishDto, owner: user });
   }
 
@@ -40,6 +40,10 @@ export class WishesService {
       throw new NotFoundException('Подарок не найден');
     }
     return wish;
+  }
+
+  async findManyByIds(ids: number[]) {
+    return await this.wishRepository.find({ where: { id: In(ids) } });
   }
 
   async update(wishId: number, updateWishDto: UpdateWishDto, userId: number): Promise<Wish> {
